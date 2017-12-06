@@ -3,9 +3,12 @@ package chat_client;
 import java.net.*;
 import java.io.*;
 import java.util.*;
+import javax.swing.JFileChooser;
+import javax.swing.JTextArea;
 
 public class client_frame extends javax.swing.JFrame 
 {
+    
     String username, address = "localhost";
     ArrayList<String> users = new ArrayList();
     int port = 2222;
@@ -141,13 +144,49 @@ public class client_frame extends javax.swing.JFrame
            }catch(Exception ex) { }
         }
     }
+    
+    /*
+    int count = 2;
+    JTextArea n = new JTextArea();
+    final JFileChooser fc = new JFileChooser();
+    */
+    public void SaveAs() {
 
+      final JFileChooser SaveAs = new JFileChooser();
+      SaveAs.setApproveButtonText("Save");
+      int actionDialog = SaveAs.showOpenDialog(this);
+      if (actionDialog != JFileChooser.APPROVE_OPTION) {
+         return;
+      }
+
+      File fileName = new File(SaveAs.getSelectedFile() + ".txt");
+      BufferedWriter outFile = null;
+      try {
+         outFile = new BufferedWriter(new FileWriter(fileName));
+
+         //n.write(outFile);   // *** here: ***
+         ta_chat.write(outFile);
+      } catch (IOException ex) {
+         ex.printStackTrace();
+      } finally {
+         if (outFile != null) {
+            try {
+               outFile.close();
+            } catch (IOException e) {
+               // one of the few times that I think that it's OK
+               // to leave this blank
+            }
+         }
+      }
+   }
+    
     //--------------------------//
     
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jFileChooser = new javax.swing.JFileChooser();
         lb_address = new javax.swing.JLabel();
         tf_address = new javax.swing.JTextField();
         lb_port = new javax.swing.JLabel();
@@ -162,11 +201,18 @@ public class client_frame extends javax.swing.JFrame
         ta_chat = new javax.swing.JTextArea();
         tf_chat = new javax.swing.JTextField();
         b_send = new javax.swing.JButton();
+        b_open = new javax.swing.JButton();
+        b_save = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Chat - Client's frame");
         setName("client"); // NOI18N
         setResizable(false);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowOpened(java.awt.event.WindowEvent evt) {
+                formWindowOpened(evt);
+            }
+        });
 
         lb_address.setText("Address : ");
 
@@ -217,6 +263,7 @@ public class client_frame extends javax.swing.JFrame
 
         ta_chat.setColumns(20);
         ta_chat.setRows(5);
+        ta_chat.setEnabled(false);
         jScrollPane1.setViewportView(ta_chat);
 
         tf_chat.addActionListener(new java.awt.event.ActionListener() {
@@ -232,6 +279,20 @@ public class client_frame extends javax.swing.JFrame
             }
         });
 
+        b_open.setText("Open");
+        b_open.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                b_openActionPerformed(evt);
+            }
+        });
+
+        b_save.setText("Save");
+        b_save.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                b_saveActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -240,9 +301,9 @@ public class client_frame extends javax.swing.JFrame
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(tf_chat, javax.swing.GroupLayout.PREFERRED_SIZE, 352, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(b_send, javax.swing.GroupLayout.DEFAULT_SIZE, 111, Short.MAX_VALUE))
+                        .addComponent(tf_chat)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(b_send, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jScrollPane1)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
@@ -252,7 +313,11 @@ public class client_frame extends javax.swing.JFrame
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(tf_address, javax.swing.GroupLayout.DEFAULT_SIZE, 89, Short.MAX_VALUE)
                             .addComponent(tf_username))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(50, 50, 50)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(b_open, javax.swing.GroupLayout.DEFAULT_SIZE, 80, Short.MAX_VALUE)
+                            .addComponent(b_save, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 53, Short.MAX_VALUE)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(lb_password, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(lb_port, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -275,10 +340,13 @@ public class client_frame extends javax.swing.JFrame
                     .addComponent(tf_address, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lb_port)
                     .addComponent(tf_port, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(b_disconnect))
+                    .addComponent(b_disconnect)
+                    .addComponent(b_open))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(tf_username)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(tf_username)
+                        .addComponent(b_save))
                     .addComponent(tf_password)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(lb_username)
@@ -364,6 +432,20 @@ public class client_frame extends javax.swing.JFrame
         tf_chat.requestFocus();
     }//GEN-LAST:event_b_sendActionPerformed
 
+    private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
+        // TODO add your handling code here:
+        ta_chat.setEnabled(false);
+    }//GEN-LAST:event_formWindowOpened
+
+    private void b_openActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b_openActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_b_openActionPerformed
+
+    private void b_saveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b_saveActionPerformed
+        // TODO add your handling code here:
+        SaveAs();
+    }//GEN-LAST:event_b_saveActionPerformed
+
     private void tf_chatActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tf_chatActionPerformed
         // TODO add your handling code here:
         String nothing = "";
@@ -387,7 +469,7 @@ public class client_frame extends javax.swing.JFrame
 
     private void tf_addressKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tf_addressKeyPressed
         // TODO add your handling code here:
-        address = tf_address.getText();
+       address = tf_address.getText();        
     }//GEN-LAST:event_tf_addressKeyPressed
 
     public static void main(String args[]) 
@@ -397,6 +479,7 @@ public class client_frame extends javax.swing.JFrame
             @Override
             public void run() 
             {
+                
                 new client_frame().setVisible(true);
             }
         });
@@ -405,7 +488,10 @@ public class client_frame extends javax.swing.JFrame
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton b_connect;
     private javax.swing.JButton b_disconnect;
+    private javax.swing.JButton b_open;
+    private javax.swing.JButton b_save;
     private javax.swing.JButton b_send;
+    private javax.swing.JFileChooser jFileChooser;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lb_address;
     private javax.swing.JLabel lb_password;
